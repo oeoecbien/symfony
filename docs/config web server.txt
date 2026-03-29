@@ -1,0 +1,135 @@
+===============================================================================
+GUIDE DE CONFIGURATION D'UN SERVEUR LOCAL AVEC VIRTUAL HOSTS (LARAGON/APACHE)
+===============================================================================
+
+--------------------------------------------------------------------------------
+1. CONFIGURATION DES VIRTUAL HOSTS
+--------------------------------------------------------------------------------
+1.1. Accéder au fichier de configuration :
+   - Chemin : C:\laragon\bin\apache\httpd-2.4.54-win64-VS16\conf\extra\httpd-vhosts.conf
+   - Ouvrir avec un éditeur de texte (ex: Notepad++, VS Code) en mode administrateur
+
+1.2. Ajouter la configuration suivante pour chaque domaine (template) :
+-------------------------------------------------------------------------------
+<VirtualHost *:80>
+    ServerName local.nom-du-projet.com
+    ServerAlias www.local.nom-du-projet.com
+    DocumentRoot "C:/laragon/www/nom-du-projet/htdocs"
+
+    <Directory "C:/laragon/www/nom-du-projet/htdocs">
+        Options +Indexes +Includes +FollowSymLinks +MultiViews
+        AllowOverride All
+        Require local
+    </Directory>
+
+    ErrorLog "logs/nom-du-projet-error.log"
+    CustomLog "logs/nom-du-projet-access.log" common
+</VirtualHost>
+-------------------------------------------------------------------------------
+Notes :
+- Remplacer "nom-du-projet" par le nom réel du projet
+- Utiliser des chemins absolus avec des "/" (et non "\")
+- Vérifier que le dossier "logs" existe dans le répertoire Apache
+
+--------------------------------------------------------------------------------
+2. MISE À JOUR DU FICHIER HOSTS
+--------------------------------------------------------------------------------
+2.1. Ouvrir le fichier hosts :
+   - Chemin : C:\Windows\System32\drivers\etc\hosts
+   - Nécessite les droits administrateur
+
+2.2. Ajouter la ligne suivante (à la fin du fichier) :
+127.0.0.1    local.nom-du-projet.com
+127.0.0.1    www.local.nom-du-projet.com
+
+2.3. Sauvegarder et vérifier avec la commande :
+ping local.nom-du-projet.com
+
+--------------------------------------------------------------------------------
+3. RÉCUPÉRATION DU CONTENU DU PROJET
+--------------------------------------------------------------------------------
+3.1. Accéder au partage réseau :
+\\Altidata\01_clients\NOM_DU_CLIENT\NOM_DU_PROJET\ELEMENTS_DEV
+
+3.2. Copier les fichiers dans :
+C:\laragon\www\nom-du-projet\htdocs
+
+3.3. Vérifier :
+- La structure des fichiers
+- Les permissions (chmod 755 pour les dossiers, 644 pour les fichiers)
+- L'existence du fichier .htaccess si projet Apache
+
+--------------------------------------------------------------------------------
+4. CONFIGURATION DE LA BASE DE DONNÉES
+--------------------------------------------------------------------------------
+4.1. Accéder à phpMyAdmin :
+   - URL : http://localhost/phpmyadmin
+   - Identifiants par défaut :
+     - Utilisateur : root
+     - Mot de passe : root
+
+4.2. Créer la base de données :
+   - Cliquer sur "Bases de données"
+   - Nom : nomduprojet_db (sans espaces, minuscules)
+   - Collation : utf8mb4_unicode_ci
+   - Cliquer sur "Créer"
+
+4.3. Importer la base (si disponible) :
+   - Sélectionner la base créée
+   - Onglet "Importer"
+   - Choisir le fichier .sql (depuis ELEMENTS_DEV)
+   - Lancer l'import
+
+--------------------------------------------------------------------------------
+5. CONFIGURATION DU FICHIER .ENV
+--------------------------------------------------------------------------------
+5.1. Renommer le fichier si nécessaire :
+cp .env.example .env
+
+5.2. Mettre à jour les paramètres principaux :
+APP_URL=http://local.nom-du-projet.com
+DB_DATABASE=nomduprojet_db
+DB_USERNAME=root
+DB_PASSWORD=root
+
+5.3. Autres paramètres à vérifier :
+- APP_DEBUG=true (pour le développement)
+- Configuration mail (MAIL_*)
+- Configuration cache (CACHE_DRIVER, SESSION_DRIVER)
+
+--------------------------------------------------------------------------------
+6. DÉMARRAGE ET VÉRIFICATION
+--------------------------------------------------------------------------------
+6.1. Lancer Laragon :
+   - Démarrer Apache et MySQL via l'interface
+   - Vérifier que les services sont "Running"
+
+6.2. Tester la configuration :
+   - Ouvrir http://local.nom-du-projet.com dans un navigateur
+   - Vérifier :
+     * L'absence d'erreurs 404/500
+     * La connexion à la base de données
+     * Le chargement des assets (CSS/JS)
+
+6.3. Dépannage :
+   - Vérifier les logs Apache : C:\laragon\bin\apache\logs\error.log
+   - Vérifier les logs PHP : C:\laragon\logs\php-error.log
+   - Redémarrer les services si nécessaire
+
+--------------------------------------------------------------------------------
+7. BONNES PRATIQUES
+--------------------------------------------------------------------------------
+[ ] Toujours travailler en local avant de déployer
+[ ] Sauvegarder la base de données avant toute modification
+[ ] Utiliser des noms de domaine cohérents (ex: local.client-projet.com)
+[ ] Documenter les configurations spécifiques dans un README.md
+[ ] Exclure les fichiers de configuration des commits Git (.env, .gitignore)
+
+--------------------------------------------------------------------------------
+8. RÉFÉRENCES UTILES
+--------------------------------------------------------------------------------
+- Documentation Apache : https://httpd.apache.org/docs/
+- Documentation Laragon : https://laragon.org/docs/
+- Configuration VirtualHost : https://httpd.apache.org/docs/2.4/vhosts/
+- Bonnes pratiques .env : https://laravel.com/docs/configuration
+===============================================================================

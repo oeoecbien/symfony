@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notes{% endblock %}
+
+{% block body %}
+    <main style="max-width: 40rem; margin: 2rem auto; padding: 0 1rem; font-family: system-ui, sans-serif;">
+        <p><a href="{{ path('app_home') }}">← Accueil</a> · <a href="{{ path('app_note_new') }}">Ajouter une note</a></p>
+        <h1>Notes (base MySQL)</h1>
+        {% if notes is empty %}
+            <p>Aucune note. <a href="{{ path('app_note_new') }}">En créer une</a>.</p>
+        {% else %}
+            <ul style="list-style: none; padding: 0;">
+                {% for note in notes %}
+                    <li style="border: 1px solid #ddd; border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem;">
+                        <strong>{{ note.title }}</strong>
+                        <small style="color: #666;"> — {{ note.createdAt|date('d/m/Y H:i') }}</small>
+                        {% if note.content %}
+                            <p style="margin: 0.5rem 0 0;">{{ note.content|nl2br }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </main>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    <main style="max-width: 40rem; margin: 3rem auto; padding: 0 1rem; font-family: system-ui, sans-serif;">
+        <h1>Application Symfony</h1>
+        <p>Projet prêt en local avec Laragon (MySQL, base <code>symfony_db</code>).</p>
+        <p><a href="{{ path('app_note_index') }}">Notes</a> — exemple CRUD minimal (liste + ajout).</p>
+        <p>En dev : <code>php -S localhost:8000 -t public</code> ou Symfony CLI <code>symfony server:start</code>.</p>
+    </main>
+{% endblock %}
